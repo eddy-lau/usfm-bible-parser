@@ -43,7 +43,7 @@ function parseBookDataFromLine(line) {
 
 }
 
-function findTagsFromLine(line) {
+function findMarkersFromLine(line) {
 
   let re = /(\\.+?[ |*]|\\.+?$)/g;
   return line.match(re);
@@ -55,8 +55,6 @@ function parseLine(line, opts) {
   opts = opts || {};
   var onStartLine = opts.onStartLine || function(){};
   var onText = opts.onText || function(){};
-  var onStartTag = opts.onStartTag || function(){};
-  var onEndTag = opts.onEndTag || function(){};
   var onEndLine = opts.onEndLine || function(){};
   var onStartMarker = opts.onStartMarker || function(){};
   var onEndMarker = opts.onEndMarker || function(){};
@@ -68,7 +66,7 @@ function parseLine(line, opts) {
   const TEXT = 0;
   const TAG = 1;
 
-  var currentTag = '';
+  var currentMarker = '';
   var currentText = '';
 
   var state = TEXT;
@@ -88,17 +86,15 @@ function parseLine(line, opts) {
     } else if (state === TAG) {
 
       if (c == ' ') {
-        onStartTag(currentTag);
-        onStartMarker(currentTag);
-        currentTag = '';
+        onStartMarker(currentMarker);
+        currentMarker = '';
         state = TEXT;
       } else if (c == '*') {
-        onEndTag(currentTag);
-        onEndMarker(currentTag);
-        currentTag = '';
+        onEndMarker(currentMarker);
+        currentMarker = '';
         state = TEXT;
       } else {
-        currentTag += c;
+        currentMarker += c;
       }
 
     } else {
@@ -112,8 +108,8 @@ function parseLine(line, opts) {
 
   if (state === TEXT && currentText.length > 0) {
     onText(currentText);
-  } else if (state === TAG && currentTag.length > 0) {
-    onStartTag(currentTag);
+  } else if (state === TAG && currentMarker.length > 0) {
+    onStartMarker(currentMarker);
   }
 
   onEndLine(line);
@@ -124,6 +120,6 @@ module.exports = {
   parseBookData: parseBookDataFromLine,
   parseChapter: parseChapterFromLine,
   parseVerse: parseVerseFromLine,
-  parseTags: findTagsFromLine,
+  parseMarkers: findMarkersFromLine,
   parseLine: parseLine
 };
