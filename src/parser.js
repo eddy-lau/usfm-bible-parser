@@ -3,14 +3,13 @@
 const fs = require('fs');
 const path = require('path');
 const LineParser = require('./line-parser');
+const bookData = require('bible-book-data');
 
-var usfmFilesDir;
 var books;
 
-function getBookData(fileName) {
+function getBookData(filePath) {
 
-  let fullPath = path.join(usfmFilesDir, fileName);
-  return readFile(fullPath).then( contents => {
+  return readFile(filePath).then( contents => {
     return contents.split('\n');
   }).then( lines => {
 
@@ -30,17 +29,21 @@ function getBookData(fileName) {
 
 }
 
-function createBook(fileName) {
+function createBook(filePath, lang) {
 
-  return getBookData(fileName).then( bookData => {
+  return getBookData(filePath).then( bookData => {
+
+    var localizedData = require('bible-book-data')(lang, [bookData.id]);
 
     return {
       index: bookData.index,
       id: bookData.id,
       name: bookData.name,
+      localizedName: localizedData[0].name,
       description: bookData.description,
       shortName: bookData.id.toLowerCase(),
-      fileName: fileName,
+      fileName: path.basename(filePath),
+      filePath: filePath,
       getTexts: function(fromLine, toLine) {
         return loadText(this, fromLine, toLine);
       },
@@ -56,11 +59,11 @@ function createBook(fileName) {
 
 }
 
-function loadBooks() {
+function loadBooks(dir, lang) {
 
   return new Promise( (resolve, reject) => {
 
-    fs.readdir(usfmFilesDir, (err, files) => {
+    fs.readdir(dir, (err, files) => {
       if (err) {
         reject(err);
       } else {
@@ -72,7 +75,8 @@ function loadBooks() {
 
     return Promise.all(
       fileNames.map( fileName => {
-        return createBook(fileName);
+        var filePath = path.join(dir, fileName);
+        return createBook(filePath, lang);
       })
     );
 
@@ -105,7 +109,7 @@ function getBooks() {
   if (books) {
     return Promise.resolve(books);
   } else {
-    return loadBooks().then( result => {
+    return loadBooks(this.dir, this.lang).then( result => {
       books = result;
       return books;
     });
@@ -115,8 +119,7 @@ function getBooks() {
 
 function loadText(book, fromLine, toLine) {
 
-  let fullPath = path.join(usfmFilesDir, book.fileName);
-  return readFile(fullPath).then( contents => {
+  return readFile(book.filePath).then( contents => {
     return contents.split('\n');
   }).then( lines => {
 
@@ -150,7 +153,7 @@ function parseBook(book, opts) {
 
 function getBook(shortName) {
 
-  return getBooks().then( books => {
+  return this.getBooks().then( books => {
 
     return books.find( book => {
       return book.shortName === shortName;
@@ -180,9 +183,10 @@ function getChapterCount(book) {
   });
 }
 
-module.exports = function(homeDir) {
-  usfmFilesDir = homeDir;
+module.exports = function(dir, lang) {
   return {
+    lang: lang,
+    dir: dir,
     getBooks: getBooks,
     getBook: getBook
   };

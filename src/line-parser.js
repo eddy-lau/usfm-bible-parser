@@ -27,7 +27,7 @@ function parseBookDataFromLine(line) {
     return undefined;
   }
 
-  var bookData = require('./bookData.js');
+  var bookData = require('bible-book-data')('en');
 
   var matches = line.match( /\\id .*/ );
   if (matches && matches.length > 0) {
