@@ -40,6 +40,7 @@ function createBook(filePath, lang) {
       id: bookData.id,
       name: bookData.name,
       localizedName: localizedData[0].name,
+      localizedAbbreviation: localizedData[0].abbreviation,
       description: bookData.description,
       shortName: bookData.id.toLowerCase(),
       fileName: path.basename(filePath),
