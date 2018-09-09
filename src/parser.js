@@ -45,6 +45,7 @@ function createBook(filePath, lang) {
       shortName: bookData.id.toLowerCase(),
       fileName: path.basename(filePath),
       filePath: filePath,
+      localizedData: localizedData[0],
       getTexts: function(fromLine, toLine) {
         return loadText(this, fromLine, toLine);
       },
