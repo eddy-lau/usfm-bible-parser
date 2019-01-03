@@ -46,8 +46,8 @@ function createBook(filePath, lang) {
       fileName: path.basename(filePath),
       filePath: filePath,
       localizedData: localizedData[0],
-      getTexts: function(fromLine, toLine) {
-        return loadText(this, fromLine, toLine);
+      getTexts: function(arg1, arg2) {
+        return loadText(this, arg1, arg2);
       },
       parse: function(opts) {
         return parseBook(this, opts);
@@ -119,11 +119,97 @@ function getBooks() {
 
 }
 
-function loadText(book, fromLine, toLine) {
+function loadText(book, arg1, arg2) {
+
+  var fromLine;
+  var toLine;
+  var fromChapter;
+  var toChapter;
+  var fromVerse;
+  var toVerse;
+
+  if (typeof(arg1)==='object') {
+    fromLine = arg1.fromLine;
+    toLine = arg1.toLine;
+    fromChapter = arg1.fromChapter;
+    fromVerse = arg1.fromVerse;
+    toChapter = arg1.toChapter;
+    toVerse = arg1.toVerse;
+  } else if (typeof(arg1)==='number') {
+    fromLine = arg1;
+    toLine = arg2;
+  }
 
   return readFile(book.filePath).then( contents => {
     return contents.split('\n');
   }).then( lines => {
+
+    if (fromChapter) {
+      fromLine = lines.findIndex( line => {
+        return LineParser.parseChapter(line) === fromChapter;
+      });
+      if (fromLine < 0) {
+        throw 'Invalid fromChapter paramter';
+      }
+
+      if (fromVerse > 1) {
+        var foundPreviousVerse = true;
+        var verseLine = lines.slice(fromLine).findIndex( line => {
+          var range = LineParser.parseVerseRange(line);
+          if (range) {
+            if (range.endVerse === fromVerse - 1) {
+              return true;
+            } else if(range.startVerse <= fromVerse &&
+                      fromVerse <= range.endVerse) {
+              foundPreviousVerse = false;
+              return true;
+            }
+          }
+          return false;
+        });
+        if (verseLine < 0) {
+          throw 'Invalid fromVerse parameter';
+        }
+        fromLine = fromLine + verseLine;
+        if (foundPreviousVerse) {
+          fromLine++;
+        }
+      } else {
+        // Skip the first chapter line
+        fromLine = fromLine + 1;
+      }
+    }
+
+    if (toChapter && !toVerse) {
+
+      fromLine = fromLine || 0;
+      toLine = lines.slice(fromLine).findIndex( line => {
+        return LineParser.parseChapter(line) === (toChapter+1);
+      });
+      toLine = toLine >= 0 ? toLine + fromLine : undefined;
+
+    } else if (toChapter && toVerse) {
+
+      var currentChapter = fromChapter || 1;
+      fromLine = fromLine || 0;
+      toLine = lines.slice(fromLine).findIndex( line => {
+
+        if (currentChapter == toChapter) {
+          var range = LineParser.parseVerseRange(line);
+          return range && range.startVerse <= toVerse && toVerse <= range.endVerse;
+        } else {
+          currentChapter = LineParser.parseChapter(line) || currentChapter;
+          return false;
+        }
+
+      });
+
+      if (toLine < 0) {
+        throw 'Invalid toVerse parameter';
+      }
+
+      toLine = toLine + fromLine + 1;
+    }
 
     if (fromLine) {
       return lines.slice(fromLine, toLine);
@@ -141,7 +227,7 @@ function parseBook(book, opts) {
   var onStartBook = opts.onStartBook || function(){};
   var onEndBook = opts.onEndBook || function(){};
 
-  return loadText(book).then( lines => {
+  return loadText(book, opts).then( lines => {
 
     onStartBook();
     lines.forEach( line => {

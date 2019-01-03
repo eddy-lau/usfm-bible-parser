@@ -21,6 +21,26 @@ function parseVerseFromLine(line) {
   }
 }
 
+function parseVerseRangeFromLine(line) {
+  if (line.startsWith('\\v ')) {
+    let nextSpaceIndex = line.indexOf(' ', 3);
+    if (nextSpaceIndex < 0) {
+      return undefined;
+    }
+    var verseRange = line.substring(3, nextSpaceIndex).split('-');
+    if (verseRange.length === 1) {
+      var verse = parseInt(verseRange[0]);
+      return {startVerse:verse, endVerse:verse};
+    } else {
+      var startVerse = parseInt(verseRange[0]);
+      var endVerse = parseInt(verseRange[1]);
+      return {startVerse:startVerse, endVerse: endVerse};
+    }
+  } else {
+    return undefined;
+  }
+}
+
 function parseBookDataFromLine(line) {
 
   if (!line) {
@@ -120,6 +140,7 @@ module.exports = {
   parseBookData: parseBookDataFromLine,
   parseChapter: parseChapterFromLine,
   parseVerse: parseVerseFromLine,
+  parseVerseRange: parseVerseRangeFromLine,
   parseMarkers: findMarkersFromLine,
   parseLine: parseLine
 };
