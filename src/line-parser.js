@@ -9,18 +9,6 @@ function parseChapterFromLine(line) {
 
 }
 
-function parseVerseFromLine(line) {
-  if (line.startsWith('\\v ')) {
-    let nextSpaceIndex = line.indexOf(' ', 3);
-    if (nextSpaceIndex < 0) {
-      return undefined;
-    }
-    return parseInt(line.substring(3, nextSpaceIndex));
-  } else {
-    return undefined;
-  }
-}
-
 function parseVerseRangeFromLine(line) {
   if (line.startsWith('\\v ')) {
     let nextSpaceIndex = line.indexOf(' ', 3);
@@ -80,8 +68,8 @@ function parseLine(line, opts) {
   var onEndMarker = opts.onEndMarker || function(){};
 
   var chapter = parseChapterFromLine(line);
-  var verse = parseVerseFromLine(line);
-  onStartLine(line, chapter, verse);
+  var verseRange = parseVerseRangeFromLine(line) || {};
+  onStartLine(line, chapter, verseRange.startVerse, verseRange.endVerse);
 
   const TEXT = 0;
   const TAG = 1;
@@ -139,7 +127,6 @@ function parseLine(line, opts) {
 module.exports = {
   parseBookData: parseBookDataFromLine,
   parseChapter: parseChapterFromLine,
-  parseVerse: parseVerseFromLine,
   parseVerseRange: parseVerseRangeFromLine,
   parseMarkers: findMarkersFromLine,
   parseLine: parseLine
