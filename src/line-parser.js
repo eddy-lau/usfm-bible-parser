@@ -9,6 +9,14 @@ function parseChapterFromLine(line) {
 
 }
 
+function parseSubjectFromLine(line) {
+  if (line.startsWith('\\s ')) {
+    return line.substring(3, line.length);
+  } else {
+    return undefined;
+  }
+}
+
 function parseVerseRangeFromLine(line) {
   if (line.startsWith('\\v ')) {
     let nextSpaceIndex = line.indexOf(' ', 3);
@@ -127,6 +135,7 @@ function parseLine(line, opts) {
 module.exports = {
   parseBookData: parseBookDataFromLine,
   parseChapter: parseChapterFromLine,
+  parseSubject: parseSubjectFromLine,
   parseVerseRange: parseVerseRangeFromLine,
   parseMarkers: findMarkersFromLine,
   parseLine: parseLine

@@ -41,6 +41,7 @@ function createBook(filePath, lang) {
       name: bookData.name,
       localizedName: localizedData[0].name,
       localizedAbbreviation: localizedData[0].abbreviation,
+      localizedAltNames: localizedData[0]['alternate-names'] || [],
       description: bookData.description,
       shortName: bookData.id.toLowerCase(),
       fileName: path.basename(filePath),
@@ -190,13 +191,32 @@ function loadText(book, arg1, arg2) {
 
     } else if (toChapter && toVerse) {
 
+      var foundToVerse = false;
       var currentChapter = fromChapter || 1;
       fromLine = fromLine || 0;
       toLine = lines.slice(fromLine).findIndex( line => {
 
         if (currentChapter == toChapter) {
           var range = LineParser.parseVerseRange(line);
-          return range && range.startVerse <= toVerse && toVerse <= range.endVerse;
+          var chapter = LineParser.parseChapter(line);
+          var subject = LineParser.parseSubject(line);
+
+          if (chapter && chapter != toChapter) {
+            // found next verse
+            return true;
+          }
+          if (range && (toVerse < range.startVerse)) {
+            // found next chapter
+            return true;
+          }
+          if (range && (range.startVerse <= toVerse && toVerse <= range.endVerse)) {
+            foundToVerse = true;
+          }
+          if (subject && foundToVerse) {
+            // FIXME: There may be some text after the subject
+            return true;
+          }
+          return false;
         } else {
           currentChapter = LineParser.parseChapter(line) || currentChapter;
           return false;
@@ -205,10 +225,14 @@ function loadText(book, arg1, arg2) {
       });
 
       if (toLine < 0) {
-        throw 'Invalid toVerse parameter';
+        if (foundToVerse) {
+          toLine = undefined;
+        } else {
+          throw 'Invalid toVerse parameter';
+        }
+      } else {
+        toLine = toLine + fromLine;
       }
-
-      toLine = toLine + fromLine + 1;
     }
 
     if (fromLine) {
