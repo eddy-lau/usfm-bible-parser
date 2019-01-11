@@ -15,11 +15,12 @@ var parser = Parser(inputDir, lang);
 
 ### <a name="book-object"></a>Book Object
 
-Properties:
+*Properties:*
 - index
 - id
 - name
 - localizedName
+- localizedAltNames
 - localizedAbbreviation
 - description
 - shortName
@@ -27,7 +28,7 @@ Properties:
 - filePath
 - localizedData
 
-Methods:
+*Methods:*
 - getTexts([fromLineNumber, toLineNumber]) - *Deprecated* Returns the text of the book.
 - getTexts(options) - Returns the text of the book with Get Texts Options.
 - parse(options) - Parse the book with the [Parse Options](#parse-options) object.

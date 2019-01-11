@@ -1,9 +1,7 @@
-/*jshint esversion: 6 */
-
+/*jshint esversion: 6, node: true */
 const fs = require('fs');
 const path = require('path');
 const LineParser = require('./line-parser');
-const bookData = require('bible-book-data');
 
 var books;
 
@@ -22,7 +20,7 @@ function getBookData(filePath) {
     if (line) {
       return LineParser.parseBookData(line);
     } else {
-      return Promise.reject('Book data not found for file: ' + fileName);
+      return Promise.reject('Book data not found for file: ' + filePath);
     }
 
   });
