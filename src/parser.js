@@ -223,11 +223,13 @@ function loadText(book, arg1, arg2) {
       });
 
       if (toLine < 0) {
-        if (foundToVerse) {
+        //if (foundToVerse) {
           toLine = undefined;
-        } else {
-          throw 'Invalid toVerse parameter';
-        }
+        // } else {
+        //   var pos = book.name + ' ' + fromChapter + ':' + fromVerse + '-' +
+        //             toChapter + ':' + toVerse;
+        //   throw 'Invalid toVerse parameter: ' + pos;
+        // }
       } else {
         toLine = toLine + fromLine;
       }
