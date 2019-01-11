@@ -8,7 +8,7 @@ var inputDir = '/path/of/the/usfm/files';
 var lang = 'zh-hant';
 var parser = Parser(inputDir, lang);
 ```
-### Parser Object
+### Methods
 
 - `getBooks()` - returns a list of [`Book`](#book-object) objects.
 - `getBook(bookShortName)` - return a book with the short name.
@@ -30,19 +30,24 @@ var parser = Parser(inputDir, lang);
 
 *Methods:*
 - getTexts([fromLineNumber, toLineNumber]) - *Deprecated* Returns the text of the book.
-- getTexts(options) - Returns the text of the book with Get Texts Options.
+- getTexts(options) - Returns the text of the book with [Get Texts Options](#get-texts-options).
 - parse(options) - Parse the book with the [Parse Options](#parse-options) object.
 - getChapterCount()
 
 ### <a name="get-texts-options"></a>Get Texts Options
 ```javascript
+// Case 1: Look up by line number
 {
   fromLine:number,
   toLine:number,
+}
+
+// Case 2: Look up by chapter and verse
+{
   fromChapter:number,
   fromVerse:number,
   toChapter:number,
-  toVerse:number
+  toVerse:number  
 }
 ```
 
