@@ -3,8 +3,6 @@ const fs = require('fs');
 const path = require('path');
 const LineParser = require('./line-parser');
 
-var books;
-
 function getBookData(filePath) {
 
   return readFile(filePath).then( contents => {
@@ -107,12 +105,12 @@ function readFile(path) {
 
 function getBooks() {
 
-  if (books) {
-    return Promise.resolve(books);
+  if (this.books) {
+    return Promise.resolve(this.books);
   } else {
     return loadBooks(this.dir, this.lang).then( result => {
-      books = result;
-      return books;
+      this.books = result;
+      return this.books;
     });
   }
 
