@@ -167,6 +167,29 @@ function findSubjectFromVerse(verseNumber, lines) {
 
 }
 
+function insertBreakAfterSubject(lines) {
+
+  var result = [];
+
+  lines.forEach( (line, index) => {
+
+    result.push(line);
+    if (LineParser.parseSubject(line) !== undefined) {
+      if (index < lines.length - 1) {
+        var nextLine = lines[index+1];
+        if (!nextLine.startsWith('\\r')) {
+          result.push('\\b');
+        }
+      }
+
+    }
+
+  });
+
+  return result;
+
+}
+
 function loadText(book, arg1, arg2) {
 
   var fromLine;
@@ -191,6 +214,8 @@ function loadText(book, arg1, arg2) {
   return readFile(book.filePath).then( contents => {
     return contents.split('\n');
   }).then( lines => {
+
+    lines = insertBreakAfterSubject(lines);
 
     if (fromChapter) {
       fromLine = lines.findIndex( line => {
