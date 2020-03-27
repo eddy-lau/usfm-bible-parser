@@ -12,23 +12,29 @@ function run(argv) {
   var toChapter;
   var toVerse;
 
-  if (argv.length == 3) {
+  var parts;
+  if (argv.length == 4) {
+    parts = [argv[2], argv[3]];
+  } else if (argv.length == 3) {
     var parts = argv[2].split(' ');
     if (parts.length < 2) {
       throw 'Invalid paramter';
     }
-    bookName = parts[0];
-    parts = parts[1].split('-');
-    var fromParts = parts[0].split(':');
-    var toParts = parts.length > 1 ? parts[1].split(':'):undefined;
-    fromChapter = parseInt(fromParts[0]);
-    fromVerse = fromParts.length > 1 ? parseInt(fromParts[1]):undefined;
-    if (toParts) {
-      toChapter = toParts.length > 1 ? parseInt(toParts[0]):fromChapter;
-      toVerse = toParts.length > 1 ? parseInt(toParts[1]):parseInt(toParts[0]);
-    }
-
+  } else {
+    throw 'Invalid number of parameter';
   }
+
+  bookName = parts[0];
+  parts = parts[1].split('-');
+  var fromParts = parts[0].split(':');
+  var toParts = parts.length > 1 ? parts[1].split(':'):undefined;
+  fromChapter = parseInt(fromParts[0]);
+  fromVerse = fromParts.length > 1 ? parseInt(fromParts[1]):undefined;
+  if (toParts) {
+    toChapter = toParts.length > 1 ? parseInt(toParts[0]):fromChapter;
+    toVerse = toParts.length > 1 ? parseInt(toParts[1]):parseInt(toParts[0]);
+  }
+
 
   var parser = Parser(rcuv.pathOfFiles, rcuv.language);
   return parser.getBook(bookName).then( _book => {

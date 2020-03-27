@@ -116,6 +116,57 @@ function getBooks() {
 
 }
 
+function findVerse(verseNumber, lines) {
+
+  var lineNumber = lines.findIndex( line => {
+    var range = LineParser.parseVerseRange(line);
+    if (range) {
+      if (range.endVerse === verseNumber) {
+        return true;
+      } else if(range.startVerse <= verseNumber &&
+                verseNumber <= range.endVerse) {
+        return true;
+      }
+    }
+    return false;
+  });
+
+  if (lineNumber > 0) {
+    const PARAGRAPH_BREAKS = [
+      '\\b', '\\m', '\\nb', '\\p', '\\ps', '\\q', '\\q1', '\\q2', '\\q3'
+    ];
+    if (PARAGRAPH_BREAKS.includes(lines[lineNumber-1].trim())) {
+      return lineNumber - 1;
+    }
+  }
+
+
+  return lineNumber;
+}
+
+function findSubjectLine(lines) {
+
+  return lines.findIndex( line => {
+    return LineParser.parseSubject(line) !== undefined;
+  });
+}
+
+function findSubjectFromVerse(verseNumber, lines) {
+
+  var verseLine = findVerse(verseNumber, lines);
+  if (verseLine < 0) {
+    return -1;
+  }
+
+  var subjectLine = findSubjectLine(lines.slice(verseLine));
+  if (subjectLine < 0) {
+    return -1;
+  }
+
+  return verseLine + subjectLine;
+
+}
+
 function loadText(book, arg1, arg2) {
 
   var fromLine;
@@ -150,27 +201,23 @@ function loadText(book, arg1, arg2) {
       }
 
       if (fromVerse > 1) {
-        var foundPreviousVerse = true;
-        var verseLine = lines.slice(fromLine).findIndex( line => {
-          var range = LineParser.parseVerseRange(line);
-          if (range) {
-            if (range.endVerse === fromVerse - 1) {
-              return true;
-            } else if(range.startVerse <= fromVerse &&
-                      fromVerse <= range.endVerse) {
-              foundPreviousVerse = false;
-              return true;
-            }
-          }
-          return false;
-        });
+        // fromLine is at beginning of chapter now.
+        // search the from verse here
+
+        var chapterLines = lines.slice(fromLine);
+        var verseLine = findVerse(fromVerse, chapterLines);
         if (verseLine < 0) {
           throw 'Invalid fromVerse parameter';
         }
-        fromLine = fromLine + verseLine;
-        if (foundPreviousVerse) {
-          fromLine++;
+
+        // Find if there is a subject before ths line
+        var subjectLine = findSubjectFromVerse(fromVerse - 1, chapterLines.slice(0, verseLine));
+        if (subjectLine >= 0) {
+          verseLine = subjectLine;
         }
+
+        fromLine = fromLine + verseLine;
+
       } else {
         // Skip the first chapter line
         fromLine = fromLine + 1;
@@ -266,7 +313,7 @@ function getBook(shortName) {
   return this.getBooks().then( books => {
 
     return books.find( book => {
-      return book.shortName === shortName;
+      return book.shortName.toLowerCase() === shortName.toLowerCase();
     });
 
   }).then( book => {
