@@ -199,7 +199,24 @@ function loadText(book, arg1, arg2) {
   var fromVerse;
   var toVerse;
 
-  if (typeof(arg1)==='object') {
+  if (arg1 && Array.isArray(arg1.scriptures)) {
+
+    if (arg1.scriptures.length == 0) {
+      return Promise.resolve([]);
+    }
+
+    return loadText(book, arg1.scriptures[0])
+    .then( result => {
+
+      arg1.scriptures = arg1.scriptures.slice(1);
+      return loadText(book, arg1)
+      .then( result2 => {
+        return result.concat(result2);
+      });
+
+    });
+
+  } else if (typeof(arg1)==='object') {
     fromLine = arg1.fromLine;
     toLine = arg1.toLine;
     fromChapter = arg1.fromChapter;
