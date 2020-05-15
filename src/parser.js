@@ -285,6 +285,7 @@ function loadText(book, arg1, arg2) {
           var range = LineParser.parseVerseRange(line);
           var chapter = LineParser.parseChapter(line);
           var subject = LineParser.parseSubject(line);
+          var chapterGroup = LineParser.parseChapterGroup(line);
 
           if (chapter && chapter != toChapter) {
             // found next verse
@@ -292,6 +293,9 @@ function loadText(book, arg1, arg2) {
           }
           if (range && (toVerse < range.startVerse)) {
             // found next chapter
+            return true;
+          }
+          if (chapterGroup) {
             return true;
           }
           if (range && (range.startVerse <= toVerse && toVerse <= range.endVerse)) {

@@ -18,6 +18,14 @@ function parseSubjectFromLine(line) {
   }
 }
 
+function parseChapterGroupFromLine(line) {
+  if (line.startsWith('\\ms ')) {
+    return line.substring(4, line.length);
+  } else {
+    return undefined;
+  }
+}
+
 function parseVerseRangeFromLine(line) {
   if (line.startsWith('\\v ')) {
     let nextSpaceIndex = line.indexOf(' ', 3);
@@ -136,6 +144,7 @@ function parseLine(line, opts) {
 module.exports = {
   parseBookData: parseBookDataFromLine,
   parseChapter: parseChapterFromLine,
+  parseChapterGroup: parseChapterGroupFromLine,
   parseSubject: parseSubjectFromLine,
   parseVerseRange: parseVerseRangeFromLine,
   parseMarkers: findMarkersFromLine,
