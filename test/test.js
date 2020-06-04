@@ -1,7 +1,8 @@
 /* jshint esversion: 6 */
 
 var Parser = require('../src/parser');
-var rcuv = require('rcuv-usfm');
+//var bible = require('rcuv-usfm');
+var bible = require('cunp-usfm');
 
 
 function run(argv) {
@@ -36,7 +37,7 @@ function run(argv) {
   }
 
 
-  var parser = Parser(rcuv.pathOfFiles, rcuv.language);
+  var parser = Parser(bible.pathOfFiles, bible.language);
   return parser.getBook(bookName).then( _book => {
 
     book = _book;

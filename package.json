@@ -12,6 +12,7 @@
     "bible-book-data": "file:../bible-book-data"
   },
   "devDependencies": {
+    "cunp-usfm": "file:../cunp-usfm",
     "rcuv-usfm": "file:../rcuv-usfm"
   }
 }
