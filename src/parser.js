@@ -73,7 +73,9 @@ function loadBooks(dir, lang) {
   }).then( fileNames => {
 
     return Promise.all(
-      fileNames.map( fileName => {
+      fileNames
+      .filter(fileName => fileName.endsWith('.USFM') || fileName.endsWith('.usfm'))
+      .map( fileName => {
         var filePath = path.join(dir, fileName);
         return createBook(filePath, lang);
       })
