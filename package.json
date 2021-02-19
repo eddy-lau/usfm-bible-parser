@@ -9,7 +9,7 @@
   "author": "Eddie Lau",
   "license": "ISC",
   "dependencies": {
-    "bible-book-data": "file:../bible-book-data"
+    "bible-book-data": "git+https://github.com/eddy-lau/bible-book-data"
   },
   "devDependencies": {
     "cunp-usfm": "file:../cunp-usfm",
