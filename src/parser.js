@@ -74,8 +74,11 @@ function loadBooks(dir, lang) {
 
     return Promise.all(
       fileNames
-      .filter(fileName => fileName.endsWith('.USFM') || fileName.endsWith('.usfm'))
-      .map( fileName => {
+      .filter(fileName => {
+        return fileName.endsWith('.USFM') ||
+          fileName.endsWith('.usfm') ||
+          fileName.endsWith('.txt');
+      }).map( fileName => {
         var filePath = path.join(dir, fileName);
         return createBook(filePath, lang);
       })
