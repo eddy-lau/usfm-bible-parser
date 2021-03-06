@@ -1,8 +1,8 @@
 /* jshint esversion: 6 */
 
 var Parser = require('../src/parser');
-//var bible = require('rcuv-usfm');
-var bible = require('cunp-usfm');
+var bible = require('rcuv-usfm');
+//var bible = require('cunp-usfm');
 
 
 function run(argv) {
