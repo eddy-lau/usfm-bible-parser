@@ -4,11 +4,14 @@
   "description": "USFM Bible Parser",
   "main": "src/main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest test"
   },
   "author": "Eddie Lau",
   "license": "ISC",
   "dependencies": {
     "bible-book-data": "git+https://github.com/eddy-lau/bible-book-data"
+  },
+  "devDependencies": {
+    "jest": "^27.0.6"
   }
 }
