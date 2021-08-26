@@ -4,15 +4,11 @@
   "description": "USFM Bible Parser",
   "main": "src/main.js",
   "scripts": {
-    "test": "node test/test.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Eddie Lau",
   "license": "ISC",
   "dependencies": {
     "bible-book-data": "git+https://github.com/eddy-lau/bible-book-data"
-  },
-  "devDependencies": {
-    "cunp-usfm": "file:../cunp-usfm",
-    "rcuv-usfm": "file:../rcuv-usfm"
   }
 }
