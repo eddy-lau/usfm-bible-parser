@@ -4,7 +4,7 @@
   "description": "USFM Bible Parser",
   "main": "src/main.js",
   "scripts": {
-    "test": "node test/test.js"
+    "test": "jest test"
   },
   "author": "Eddie Lau",
   "license": "ISC",
@@ -12,7 +12,6 @@
     "bible-book-data": "git+https://github.com/eddy-lau/bible-book-data"
   },
   "devDependencies": {
-    "cunp-usfm": "file:../cunp-usfm",
-    "rcuv-usfm": "file:../rcuv-usfm"
+    "jest": "^27.0.6"
   }
 }
