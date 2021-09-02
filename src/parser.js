@@ -293,11 +293,11 @@ function loadText(book, arg1, arg2) {
           var chapterGroup = LineParser.parseChapterGroup(line);
 
           if (chapter && chapter != toChapter) {
-            // found next verse
+            // found next chapter
             return true;
           }
           if (range && (toVerse < range.startVerse)) {
-            // found next chapter
+            // found next verse
             return true;
           }
           if (chapterGroup) {
@@ -306,9 +306,16 @@ function loadText(book, arg1, arg2) {
           if (range && (range.startVerse <= toVerse && toVerse <= range.endVerse)) {
             foundToVerse = true;
           }
-          if (subject && foundToVerse) {
-            // FIXME: There may be some text after the subject
-            return true;
+          if (foundToVerse) {
+
+            if (chapter && chapter != toChapter) {
+              // found next chatper
+              return true;
+            }
+            if (range && (toVerse < range.startVerse)) {
+              // found next verse
+              return true;
+            }              
           }
           return false;
         } else {
