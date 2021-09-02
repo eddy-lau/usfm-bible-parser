@@ -306,10 +306,23 @@ function loadText(book, arg1, arg2) {
           if (range && (range.startVerse <= toVerse && toVerse <= range.endVerse)) {
             foundToVerse = true;
           }
+<<<<<<< HEAD
           if (subject && foundToVerse) {
             // FIXME: There may be some text after the subject
             console.warn(`FIXME: There may be some text after the subject: "${subject}"`);
             return true;
+=======
+          if (foundToVerse) {
+
+            if (chapter && chapter != toChapter) {
+              // found next chatper
+              return true;
+            }
+            if (range && (toVerse < range.startVerse)) {
+              // found next verse
+              return true;
+            }              
+>>>>>>> b3218455fdde2cffee43eb12d03f83adf559588e
           }
           return false;
         } else {
