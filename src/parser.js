@@ -293,11 +293,11 @@ function loadText(book, arg1, arg2) {
           var chapterGroup = LineParser.parseChapterGroup(line);
 
           if (chapter && chapter != toChapter) {
-            // found next verse
+            // found next chapter
             return true;
           }
           if (range && (toVerse < range.startVerse)) {
-            // found next chapter
+            // found next verse
             return true;
           }
           if (chapterGroup) {
@@ -308,6 +308,7 @@ function loadText(book, arg1, arg2) {
           }
           if (subject && foundToVerse) {
             // FIXME: There may be some text after the subject
+            console.warn(`FIXME: There may be some text after the subject: "${subject}"`);
             return true;
           }
           return false;
