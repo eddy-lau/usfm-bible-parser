@@ -12,6 +12,8 @@ function run(argv) {
   var fromVerse;
   var toChapter;
   var toVerse;
+  let secondHalfOfFirstVerse = false;
+  let firstHalfOfLastVerse = false;
 
   var parts;
   if (argv.length == 4) {
@@ -30,10 +32,27 @@ function run(argv) {
   var fromParts = parts[0].split(':');
   var toParts = parts.length > 1 ? parts[1].split(':'):undefined;
   fromChapter = parseInt(fromParts[0]);
-  fromVerse = fromParts.length > 1 ? parseInt(fromParts[1]):undefined;
+  var fromVerseStr = fromParts.length > 1 ? fromParts[1] : undefined;
+  if (fromVerseStr) {
+    fromVerse = parseInt(fromVerseStr);
+    if (fromVerseStr.endsWith('b')) {
+      secondHalfOfFirstVerse = true;
+    }
+  }
+
+
   if (toParts) {
     toChapter = toParts.length > 1 ? parseInt(toParts[0]):fromChapter;
-    toVerse = toParts.length > 1 ? parseInt(toParts[1]):parseInt(toParts[0]);
+    var toVerseStr = toParts.length > 1 ? toParts[1] : toParts[0];
+    toVerse = parseInt(toVerseStr);
+
+    if (toVerseStr.endsWith('a')) {
+      // To handle the following
+      // e.g. ACT 9:1-19a
+      // Just need the first half of the to verse text.
+      firstHalfOfLastVerse = true;
+    }
+
   }
 
 
@@ -46,10 +65,12 @@ function run(argv) {
   }).then( _chapterCount => {
 
     return book.getTexts({
-      fromChapter: fromChapter,
-      fromVerse: fromVerse,
-      toChapter: toChapter,
-      toVerse: toVerse
+      fromChapter,
+      fromVerse,
+      toChapter,
+      toVerse,
+      secondHalfOfFirstVerse,
+      firstHalfOfLastVerse
     });
 
   }).then( texts => {

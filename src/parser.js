@@ -195,6 +195,39 @@ function insertBreakAfterSubject(lines) {
 
 }
 
+function findLastParagraphText(lines, toVerse, toChapter) {
+
+  var lastIndex;
+
+  for (var index = 0; index < lines.length; index++) {
+
+    let line = lines[index];
+    var range = LineParser.parseVerseRange(line);
+    var chapter = LineParser.parseChapter(line);
+    var paragraphText = LineParser.parseParagraphText(line);
+    var chapterGroup = LineParser.parseChapterGroup(line);
+
+    if (chapter && chapter != toChapter) {
+      // found next chapter
+      break;
+    }
+    if (range && (toVerse < range.startVerse)) {
+      // found next verse
+      break;
+    }
+    if (chapterGroup) {
+      break;
+    }
+
+    if (paragraphText) {
+      lastIndex = index;
+    }
+
+  }
+
+  return lastIndex;
+}
+
 function loadText(book, arg1, arg2) {
 
   var fromLine;
@@ -203,6 +236,8 @@ function loadText(book, arg1, arg2) {
   var toChapter;
   var fromVerse;
   var toVerse;
+  var secondHalfOfFirstVerse;
+  var firstHalfOfLastVerse;
 
   if (arg1 && Array.isArray(arg1.scriptures)) {
 
@@ -228,6 +263,8 @@ function loadText(book, arg1, arg2) {
     fromVerse = arg1.fromVerse;
     toChapter = arg1.toChapter;
     toVerse = arg1.toVerse;
+    secondHalfOfFirstVerse = arg1.secondHalfOfFirstVerse;
+    firstHalfOfLastVerse = arg1.firstHalfOfLastVerse;
   } else if (typeof(arg1)==='number') {
     fromLine = arg1;
     toLine = arg2;
@@ -284,14 +321,18 @@ function loadText(book, arg1, arg2) {
       var foundToVerse = false;
       var currentChapter = fromChapter || 1;
       fromLine = fromLine || 0;
-      toLine = lines.slice(fromLine).findIndex( line => {
+      toLine = lines.slice(fromLine).findIndex( (line, index, array) => {
 
         if (currentChapter == toChapter) {
           var range = LineParser.parseVerseRange(line);
           var chapter = LineParser.parseChapter(line);
           var subject = LineParser.parseSubject(line);
           var chapterGroup = LineParser.parseChapterGroup(line);
+          var lastVerseIndex;
 
+          if (lastVerseIndex !== undefined) {
+            return index == lastVerseIndex;
+          }
           if (chapter && chapter != toChapter) {
             // found next chapter
             return true;
@@ -306,17 +347,33 @@ function loadText(book, arg1, arg2) {
           if (range && (range.startVerse <= toVerse && toVerse <= range.endVerse)) {
             foundToVerse = true;
           }
-          if (foundToVerse) {
+          if (subject && foundToVerse) {
 
-            if (chapter && chapter != toChapter) {
-              // found next chatper
+            if (firstHalfOfLastVerse) {
+              // e.g. ACT 9:1-19a
               return true;
             }
-            if (range && (toVerse < range.startVerse)) {
-              // found next verse
-              return true;
-            }              
+            // FIXME
+
+            // 2PE 2:1-10a      2PE 2:10b-22
+            // JHN 15:18-16:4a  JHN 16:4b-15
+            // LUK 9:18-43a     LUK 9:43b-62
+            // ACT 9:1-19a      ACT 9:19b-31
+            // ISA 24:1-16a     ISA 24:16b-23
+
+
+            // if subject is found, 
+            // check if any text after the subject belongs to the 'to verse'.
+            // if no, the subject is belongs to next verse.
+            let lastIndex = findLastParagraphText(array.slice(index), toVerse, toChapter);
+            if (lastIndex >= 0) {
+              lastVerseIndex = index + lastIndex;
+              return index == lastVerseIndex;
+            }
+
+            return true;
           }
+
           return false;
         } else {
           currentChapter = LineParser.parseChapter(line) || currentChapter;

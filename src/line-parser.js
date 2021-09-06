@@ -46,6 +46,17 @@ function parseVerseRangeFromLine(line) {
   }
 }
 
+function parseParagraphTextFromLine(line) {
+  if (!line.startsWith('\\p ')) {
+    return undefined;
+  }
+  let text = line.substring(3).trim();
+  if (text.length == 0) {
+    return undefined;
+  }
+  return text;
+}
+
 function parseBookDataFromLine(line) {
 
   if (!line) {
@@ -148,5 +159,6 @@ module.exports = {
   parseSubject: parseSubjectFromLine,
   parseVerseRange: parseVerseRangeFromLine,
   parseMarkers: findMarkersFromLine,
+  parseParagraphText: parseParagraphTextFromLine,
   parseLine: parseLine
 };
