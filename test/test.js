@@ -1,11 +1,15 @@
 /* jshint esversion: 6 */
 
 var Parser = require('../src/parser');
-var bible = require('rcuv-usfm');
+//var bible = require('rcuv-usfm');
 //var bible = require('cunp-usfm');
 
+var bibles = [
+  {name: 'RCUV', bible: require('rcuv-usfm')},
+  {name: 'CUNP', bible: require('cunp-usfm')}
+];
 
-function run(argv) {
+function run(argv, bible) {
 
   var bookName;
   var fromChapter;
@@ -81,6 +85,22 @@ function run(argv) {
 
 }
 
-run(process.argv).catch( err => {
-  console.log("Error: ", err);
-});
+bibles.map( bible => {
+
+  return () => {
+
+    console.log(`*******************************`);
+    console.log(`*     ${bible.name}`);
+    console.log(`*******************************`);
+
+    return run(process.argv, bible.bible).catch( err => {
+      console.log("Error: ", err);
+    })
+  }
+
+}).reduce( (promise, fn ) => {
+
+  return promise.then( ()=> fn() )
+}, Promise.resolve())
+
+

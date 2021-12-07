@@ -25,6 +25,16 @@ function getBookData(filePath) {
 
 }
 
+function replaceText(lines, fromText, toText) {
+  return lines.map( line => {
+    if (line == fromText) {
+      return toText;
+    } else {
+      return line;
+    }
+  });
+}
+
 function createBook(filePath, lang) {
 
   return getBookData(filePath).then( bookData => {
@@ -400,6 +410,49 @@ function loadText(book, arg1, arg2) {
     } else {
       return lines;
     }
+
+  }).then (lines => {
+
+    // 1SA 2:11a
+    if (book.id == '1SA' && toChapter == 2 && toVerse == 11 && firstHalfOfLastVerse) {
+
+      lines = replaceText(lines, 
+        '\\v 11 \\pn 以利加拿\\pn*往\\pn 拉瑪\\pn*回自己的家去了。那孩子在\\pn 以利\\pn*祭司面前事奉耶和華。',
+        '\\v 11 \\pn 以利加拿\\pn*往\\pn 拉瑪\\pn*回自己的家去了。'
+      );
+
+      lines = replaceText(lines,
+        '\\v 11 \\pn 以利加拿\\pn*往\\pn 拉瑪\\pn*回家去了。那孩子在祭司\\pn 以利\\pn*面前事奉耶和華。',
+        '\\v 11 \\pn 以利加拿\\pn*往\\pn 拉瑪\\pn*回家去了。'
+      );
+
+    }
+
+    // 1SA 2:11b
+    if (book.id == '1SA' && fromChapter == 2 && fromVerse == 11 && secondHalfOfFirstVerse) {
+
+      lines = replaceText(lines, 
+        '\\v 11 \\pn 以利加拿\\pn*往\\pn 拉瑪\\pn*回家去了。那孩子在祭司\\pn 以利\\pn*面前事奉耶和華。',
+        '\\p 那孩子在祭司\\pn 以利\\pn*面前事奉耶和華。',
+      );
+
+      lines = replaceText(lines,
+        '\\v 11 \\pn 以利加拿\\pn*往\\pn 拉瑪\\pn*回自己的家去了。那孩子在\\pn 以利\\pn*祭司面前事奉耶和華。',
+        '\\p 那孩子在\\pn 以利\\pn*祭司面前事奉耶和華。',
+      );
+
+    }
+
+    // 1SA 4:1b
+    if (book.id == '1SA' && fromChapter == 4 && fromVerse == 1 && secondHalfOfFirstVerse) {
+
+      lines = replaceText(lines,
+        '\\v 1 \\pn 撒母耳\\pn*的話傳遍了全\\pn 以色列\\pn*。',
+        '\\p',
+      );
+    }
+
+    return lines;
 
   });
 

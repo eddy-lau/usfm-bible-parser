@@ -11,7 +11,7 @@ function parseChapterFromLine(line) {
 }
 
 function parseSubjectFromLine(line) {
-  if (line.startsWith('\\s ')) {
+  if (line.startsWith('\\s ') || line.startsWith('\\s2 ')) {
     return line.substring(3, line.length);
   } else {
     return undefined;
