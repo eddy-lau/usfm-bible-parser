@@ -1,15 +1,7 @@
 /* jshint esversion: 6 */
+const Parser = require('../src/parser');
 
-var Parser = require('../src/parser');
-//var bible = require('rcuv-usfm');
-//var bible = require('cunp-usfm');
-
-var bibles = [
-  {name: 'RCUV', bible: require('rcuv-usfm')},
-  {name: 'CUNP', bible: require('cunp-usfm')}
-];
-
-function run(argv, bible) {
+function parseArguments(argv) {
 
   var bookName;
   var fromChapter;
@@ -59,48 +51,50 @@ function run(argv, bible) {
 
   }
 
+  return {
+    bookName,
+    fromChapter,
+    fromVerse,
+    toChapter,
+    toVerse,
+    secondHalfOfFirstVerse,
+    firstHalfOfLastVerse
+  }
+}
 
+async function run(argv, bible) {
+
+  let options = parseArguments(argv);
   var parser = Parser(bible.pathOfFiles, bible.language);
-  return parser.getBook(bookName).then( _book => {
+  book = await parser.getBook(options.bookName);
+  chapterCount = await book.getChapterCount();
 
-    book = _book;
-    return book.getChapterCount();
+  console.log(`*******************************`);
+  console.log(options);
+  console.log(`*******************************`);
 
-  }).then( _chapterCount => {
-
-    return book.getTexts({
-      fromChapter,
-      fromVerse,
-      toChapter,
-      toVerse,
-      secondHalfOfFirstVerse,
-      firstHalfOfLastVerse
-    });
-
-  }).then( texts => {
-
-    texts.forEach( text => console.log(text ));
-
-  });
+  let texts = await book.getTexts(options);
+  return texts.forEach( text => console.log(text ));
 
 }
 
-bibles.map( bible => {
+async function main(argv) {
 
-  return () => {
+  const bibles = [
+    {name: 'RCUV', bible: require('rcuv-usfm')},
+    {name: 'CUNP', bible: require('cunp-usfm')}
+  ];
+
+  for (let i = 0; i<bibles.length; i++) {
+    let bible = bibles[i]
 
     console.log(`*******************************`);
     console.log(`*     ${bible.name}`);
     console.log(`*******************************`);
-
-    return run(process.argv, bible.bible).catch( err => {
-      console.log("Error: ", err);
-    })
+    await run(argv, bible.bible)
   }
 
-}).reduce( (promise, fn ) => {
+}
 
-  return promise.then( ()=> fn() )
-}, Promise.resolve())
-
+main(process.argv)
 
