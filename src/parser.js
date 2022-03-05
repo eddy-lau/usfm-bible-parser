@@ -452,6 +452,15 @@ function loadText(book, arg1, arg2) {
       );
     }
 
+    // 2SA 12:15b
+    if (book.id == '2SA' && fromChapter == 12 && fromVerse == 15 && secondHalfOfFirstVerse) {
+
+      lines = replaceText(lines,
+        '\\v 15 \\pn 拿單\\pn*就回家去了。',
+        '\\p',
+      );
+    }
+
     return lines;
 
   });
