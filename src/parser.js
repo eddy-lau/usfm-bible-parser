@@ -461,6 +461,15 @@ function loadText(book, arg1, arg2) {
       );
     }
 
+    // PSA 73:1-14
+    if (book.id == 'PSA' && fromChapter == 73 && fromVerse == 1) {
+
+      if (!lines.find(line => line == '\\d 亞薩的詩。')) {
+        lines = ['\\d 亞薩的詩。', ...lines];
+      }
+
+    }
+
     return lines;
 
   });
