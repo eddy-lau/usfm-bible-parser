@@ -470,6 +470,35 @@ function loadText(book, arg1, arg2) {
 
     }
 
+    // 2KI 5:1-19a
+    if (book.id == '2KI' && toChapter == 5 && toVerse == 19 && firstHalfOfLastVerse) {
+
+      lines = replaceText(lines,
+        '\\p \\pn 乃縵\\pn*就離開他去了；走了不遠，',
+        '\\p',
+      );
+
+      lines = replaceText(lines,
+        '\\p \\pn 乃縵\\pn*離開他去了。走了一小段路，',
+        '\\p',
+      );
+    }
+
+    // 2KI 5:19b-27
+    if (book.id == '2KI' && fromChapter == 5 && fromVerse == 19 && secondHalfOfFirstVerse) {
+
+      lines = replaceText(lines,
+        '\\v 19 \\pn 以利沙\\pn*對他說：「你可以平平安安地回去！」',
+        '\\p',
+      );
+
+      lines = replaceText(lines,
+        '\\v 19 \\pn 以利沙\\pn*對他說：「你平安地回去吧！」',
+        '\\p',
+      );
+
+    }
+
     return lines;
 
   });
