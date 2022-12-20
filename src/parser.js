@@ -499,6 +499,46 @@ function loadText(book, arg1, arg2) {
 
     }
 
+    // LEV 19:1-19a
+    if (book.id == 'LEV' && toChapter == 19 && toVerse == 19 && firstHalfOfLastVerse) {
+
+      lines = replaceText(lines,
+        '\\v 19 「你們要守我的律例。不可叫你的牲畜與異類配合；不可用兩樣攙雜的種種你的地，也不可用兩樣攙雜的料做衣服穿在身上。',
+        '\\v 19 「你們要守我的律例。'
+      );
+
+      lines = replaceText(lines,
+        '\\v 19 「你們要遵守我的律例。不可使你的牲畜與異類交配；不可在你的田地播下兩樣的種子；也不可穿兩種原料做成的衣服。',
+        '\\v 19 「你們要遵守我的律例。'
+      );
+
+    }
+
+    // LEV 19:19b-37
+    if (book.id == 'LEV' && fromChapter == 19 && fromVerse == 19 && secondHalfOfFirstVerse) {
+
+      lines = replaceText(lines,
+        '\\v 19 「你們要守我的律例。不可叫你的牲畜與異類配合；不可用兩樣攙雜的種種你的地，也不可用兩樣攙雜的料做衣服穿在身上。',
+        '\\p 不可叫你的牲畜與異類配合；不可用兩樣攙雜的種種你的地，也不可用兩樣攙雜的料做衣服穿在身上。',
+      );
+
+      lines = replaceText(lines,
+        '\\v 19 「你們要遵守我的律例。不可使你的牲畜與異類交配；不可在你的田地播下兩樣的種子；也不可穿兩種原料做成的衣服。',
+        '\\p 不可使你的牲畜與異類交配；不可在你的田地播下兩樣的種子；也不可穿兩種原料做成的衣服。'
+      );
+
+    }
+
+
+    // PSA 90:1-17
+    if (book.id == 'PSA' && fromChapter == 90 && fromVerse == 1) {
+
+      if (!lines.find(line => line == '\\d 神人摩西的祈禱。')) {
+        lines = ['\\d 神人摩西的祈禱。', ...lines];
+      }
+
+    }
+
     return lines;
 
   });
