@@ -131,7 +131,7 @@ function getBooks() {
 
 }
 
-function findVerse(verseNumber, lines, chapter) {
+function findVerse(verseNumber, lines, chapter?) {
 
   var lineNumber = lines.findIndex( line => {
     let chap = LineParser.parseChapter(line);
@@ -244,7 +244,7 @@ function findLastParagraphText(lines, toVerse, toChapter) {
   return lastIndex;
 }
 
-function loadText(book, arg1, arg2) {
+function loadText(book, arg1?, arg2?) {
 
   var fromLine;
   var toLine;

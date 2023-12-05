@@ -13,6 +13,7 @@
   },
   "devDependencies": {
     "cunp-usfm": "file:../cunp-usfm",
-    "rcuv-usfm": "file:../rcuv-usfm"
+    "rcuv-usfm": "file:../rcuv-usfm",
+    "typescript": "^5.3.2"
   }
 }
