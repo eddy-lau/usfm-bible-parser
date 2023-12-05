@@ -131,9 +131,15 @@ function getBooks() {
 
 }
 
-function findVerse(verseNumber, lines) {
+function findVerse(verseNumber, lines, chapter) {
 
   var lineNumber = lines.findIndex( line => {
+    let chap = LineParser.parseChapter(line);
+    if (chapter !== undefined && chap !== undefined && chapter !== chap) {
+      // Handle the case of CUNP JHN 7:53-8:11
+      // Because CUNP doesn't have JHN 7:53.
+      return true;
+    }
     var range = LineParser.parseVerseRange(line);
     if (range) {
       if (range.endVerse === verseNumber) {
@@ -299,7 +305,7 @@ function loadText(book, arg1, arg2) {
         // search the from verse here
 
         var chapterLines = lines.slice(fromLine);
-        var verseLine = findVerse(fromVerse, chapterLines);
+        var verseLine = findVerse(fromVerse, chapterLines, fromChapter);
         if (verseLine < 0) {
           throw 'Invalid fromVerse parameter';
         }
