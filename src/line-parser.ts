@@ -1,7 +1,8 @@
 /*jshint esversion: 6, node: true */
 'use strict';
+import BibleBookData from 'bible-book-data';
 
-function parseChapterFromLine(line) {
+function parseChapterFromLine(line:string): number | undefined {
   if (line.startsWith('\\c ')) {
     return parseInt(line.substring(3, line.length));
   } else {
@@ -10,7 +11,7 @@ function parseChapterFromLine(line) {
 
 }
 
-function parseSubjectFromLine(line) {
+function parseSubjectFromLine(line:string): string|undefined {
   if (line.startsWith('\\s ') || line.startsWith('\\s2 ')) {
     return line.substring(3, line.length);
   } else {
@@ -18,7 +19,7 @@ function parseSubjectFromLine(line) {
   }
 }
 
-function parseChapterGroupFromLine(line) {
+function parseChapterGroupFromLine(line:string): string|undefined {
   if (line.startsWith('\\ms ')) {
     return line.substring(4, line.length);
   } else {
@@ -26,7 +27,12 @@ function parseChapterGroupFromLine(line) {
   }
 }
 
-function parseVerseRangeFromLine(line) {
+type VerseRange = {
+  startVerse:number, 
+  endVerse:number  
+}
+
+function parseVerseRangeFromLine(line:string): VerseRange | undefined {
   if (line.startsWith('\\v ')) {
     let nextSpaceIndex = line.indexOf(' ', 3);
     if (nextSpaceIndex < 0) {
@@ -46,7 +52,7 @@ function parseVerseRangeFromLine(line) {
   }
 }
 
-function parseParagraphTextFromLine(line) {
+function parseParagraphTextFromLine(line:string):string|undefined {
   if (!line.startsWith('\\p ')) {
     return undefined;
   }
@@ -57,13 +63,13 @@ function parseParagraphTextFromLine(line) {
   return text;
 }
 
-function parseBookDataFromLine(line) {
+function parseBookDataFromLine(line:string) {
 
   if (!line) {
     return undefined;
   }
 
-  var bookData = require('bible-book-data')('en');
+  var bookData = BibleBookData('en');
 
   var matches = line.match( /\\id .*/ );
   if (matches && matches.length > 0) {
@@ -79,14 +85,22 @@ function parseBookDataFromLine(line) {
 
 }
 
-function findMarkersFromLine(line) {
+function findMarkersFromLine(line:string) {
 
   let re = /(\\.+?[ |*]|\\.+?$)/g;
   return line.match(re);
 
 }
 
-function parseLine(line, opts) {
+export type ParseLineOptions = {
+  onStartLine?: (line:string, chapter:number|undefined, startVerse?:number, endVerse?:number) => {}
+  onText?: (line:string) => {}
+  onEndLine?: (line:string) => {}
+  onStartMarker?: (marker:string) => {}
+  onEndMarker?: (marker:string) => {}
+}
+
+function parseLine(line:string, opts:ParseLineOptions) {
 
   opts = opts || {};
   var onStartLine = opts.onStartLine || function(){};
@@ -95,9 +109,9 @@ function parseLine(line, opts) {
   var onStartMarker = opts.onStartMarker || function(){};
   var onEndMarker = opts.onEndMarker || function(){};
 
-  var chapter = parseChapterFromLine(line);
-  var verseRange = parseVerseRangeFromLine(line) || {};
-  onStartLine(line, chapter, verseRange.startVerse, verseRange.endVerse);
+  let chapter:number|undefined = parseChapterFromLine(line);
+  var verseRange = parseVerseRangeFromLine(line);
+  onStartLine(line, chapter, verseRange?.startVerse, verseRange?.endVerse);
 
   const TEXT = 0;
   const TAG = 1;
@@ -152,7 +166,7 @@ function parseLine(line, opts) {
 
 }
 
-module.exports = {
+export default {
   parseBookData: parseBookDataFromLine,
   parseChapter: parseChapterFromLine,
   parseChapterGroup: parseChapterGroupFromLine,

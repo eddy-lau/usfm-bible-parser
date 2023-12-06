@@ -1,21 +1,23 @@
+import { exit } from "process";
+
 /* jshint esversion: 6 */
-const Parser = require('../src/parser');
+import Parser, { LoadTextOptions } from '../src/parser';
 
-function parseArguments(argv) {
+function parseArguments(argv:string[]): LoadTextOptions & { bookName:string } {
 
-  var bookName;
-  var fromChapter;
-  var fromVerse;
-  var toChapter;
-  var toVerse;
+  var bookName:string;
+  var fromChapter:number;
+  var fromVerse:number|undefined;
+  var toChapter:number|undefined;
+  var toVerse:number|undefined;
   let secondHalfOfFirstVerse = false;
   let firstHalfOfLastVerse = false;
 
-  var parts;
+  var parts:string[];
   if (argv.length == 4) {
     parts = [argv[2], argv[3]];
   } else if (argv.length == 3) {
-    var parts = argv[2].split(' ');
+    parts = argv[2].split(' ');
     if (parts.length < 2) {
       throw 'Invalid paramter';
     }
@@ -62,12 +64,12 @@ function parseArguments(argv) {
   }
 }
 
-async function run(argv, bible) {
+async function run(argv:string[], bible:any) {
 
   let options = parseArguments(argv);
   var parser = Parser(bible.pathOfFiles, bible.language);
-  book = await parser.getBook(options.bookName);
-  chapterCount = await book.getChapterCount();
+  let book = await parser.getBook(options.bookName);
+  let chapterCount = await book.getChapterCount();
 
   console.log(`*******************************`);
   console.log(options);
@@ -78,7 +80,12 @@ async function run(argv, bible) {
 
 }
 
-async function main(argv) {
+async function main(argv:string[]) {
+
+  if (argv.length <= 2) {
+    console.log('Usage ts-node test.js GEN 1:1-2:1')
+    exit()
+  }
 
   const bibles = [
     {name: 'RCUV', bible: require('rcuv-usfm')},

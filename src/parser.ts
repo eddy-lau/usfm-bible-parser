@@ -1,31 +1,26 @@
 /*jshint esversion: 6, node: true */
-const fs = require('fs');
-const path = require('path');
-const LineParser = require('./line-parser');
+import * as fs from 'fs';
+import * as path from 'path';
+import LineParser from './line-parser';
+import BibleBookData, { Language } from 'bible-book-data';
+import { Book, LoadTextOptions, Scriptures } from './Book'
 
-function getBookData(filePath) {
+async function getBookData(filePath:string) {
 
-  return readFile(filePath).then( contents => {
-    return contents.split('\n');
-  }).then( lines => {
-
-    return lines.find( line => {
-      return LineParser.parseBookData(line) !== undefined;
-    });
-
-  }).then( line => {
-
-    if (line) {
-      return LineParser.parseBookData(line);
-    } else {
-      return Promise.reject('Book data not found for file: ' + filePath);
-    }
-
+  const contents = await readFile(filePath);
+  const lines = contents.split('\n');
+  const bookLine = lines.find(line => {
+    return LineParser.parseBookData(line) !== undefined;
   });
+  if (bookLine) {
+    return LineParser.parseBookData(bookLine);
+  } else {
+    return Promise.reject('Book data not found for file: ' + filePath);
+  }
 
 }
 
-function replaceText(lines, fromText, toText) {
+function replaceText(lines:string[], fromText:string, toText:string) {
   return lines.map( line => {
     if (line == fromText) {
       return toText;
@@ -35,13 +30,17 @@ function replaceText(lines, fromText, toText) {
   });
 }
 
-function createBook(filePath, lang) {
+function createBook(filePath:string, lang:Language):Promise<Book> {
 
   return getBookData(filePath).then( bookData => {
 
-    var localizedData = require('bible-book-data')(lang, [bookData.id]);
+    if (!bookData) {
+      throw `Book data not found for file: ${filePath}`
+    }
 
-    return {
+    var localizedData = BibleBookData(lang, [bookData.id]);
+
+    const result:Book = {
       index: bookData.index,
       id: bookData.id,
       name: bookData.name,
@@ -53,10 +52,10 @@ function createBook(filePath, lang) {
       fileName: path.basename(filePath),
       filePath: filePath,
       localizedData: localizedData[0],
-      getTexts: function(arg1, arg2) {
+      getTexts: function(arg1:number, arg2:number) {
         return loadText(this, arg1, arg2);
       },
-      parse: function(opts) {
+      parse: function(opts:LoadTextOptions) {
         return parseBook(this, opts);
       },
       getChapterCount: function() {
@@ -64,13 +63,15 @@ function createBook(filePath, lang) {
       }
     };
 
+    return result;
+
   });
 
 }
 
-function loadBooks(dir, lang) {
+function loadBooks(dir:string, lang:Language) {
 
-  return new Promise( (resolve, reject) => {
+  return new Promise<string[]>( (resolve, reject) => {
 
     fs.readdir(dir, (err, files) => {
       if (err) {
@@ -103,7 +104,7 @@ function loadBooks(dir, lang) {
   });
 }
 
-function readFile(path) {
+function readFile(path:string):Promise<string> {
 
   return new Promise( (resolve, reject) => {
 
@@ -118,20 +119,7 @@ function readFile(path) {
   });
 }
 
-function getBooks() {
-
-  if (this.books) {
-    return Promise.resolve(this.books);
-  } else {
-    return loadBooks(this.dir, this.lang).then( result => {
-      this.books = result;
-      return this.books;
-    });
-  }
-
-}
-
-function findVerse(verseNumber, lines, chapter?) {
+function findVerse(verseNumber:number, lines:string[], chapter?:number) {
 
   var lineNumber = lines.findIndex( line => {
     let chap = LineParser.parseChapter(line);
@@ -165,14 +153,14 @@ function findVerse(verseNumber, lines, chapter?) {
   return lineNumber;
 }
 
-function findSubjectLine(lines) {
+function findSubjectLine(lines:string[]) {
 
   return lines.findIndex( line => {
     return LineParser.parseSubject(line) !== undefined;
   });
 }
 
-function findSubjectFromVerse(verseNumber, lines) {
+function findSubjectFromVerse(verseNumber:number, lines:string[]) {
 
   var verseLine = findVerse(verseNumber, lines);
   if (verseLine < 0) {
@@ -188,9 +176,9 @@ function findSubjectFromVerse(verseNumber, lines) {
 
 }
 
-function insertBreakAfterSubject(lines) {
+function insertBreakAfterSubject(lines:string[]) {
 
-  var result = [];
+  var result:string[] = [];
 
   lines.forEach( (line, index) => {
 
@@ -211,14 +199,14 @@ function insertBreakAfterSubject(lines) {
 
 }
 
-function findLastParagraphText(lines, toVerse, toChapter) {
+function findLastParagraphText(lines:string[], toVerse:number, toChapter:number) {
 
   var lastIndex;
 
   for (var index = 0; index < lines.length; index++) {
 
     let line = lines[index];
-    var range = LineParser.parseVerseRange(line);
+    let range = LineParser.parseVerseRange(line);
     var chapter = LineParser.parseChapter(line);
     var paragraphText = LineParser.parseParagraphText(line);
     var chapterGroup = LineParser.parseChapterGroup(line);
@@ -243,28 +231,28 @@ function findLastParagraphText(lines, toVerse, toChapter) {
 
   return lastIndex;
 }
+function loadText(book:Book, arg1?:LoadTextOptions|Scriptures|number, arg2?:number):Promise<string[]> {
 
-function loadText(book, arg1?, arg2?) {
+  var fromLine: number | undefined;
+  var toLine: number | undefined;
+  var fromChapter: number | undefined;
+  var toChapter: number | undefined;
+  var fromVerse: number | undefined;
+  var toVerse: number | undefined;
+  var secondHalfOfFirstVerse: boolean | undefined;
+  var firstHalfOfLastVerse: boolean | undefined;
 
-  var fromLine;
-  var toLine;
-  var fromChapter;
-  var toChapter;
-  var fromVerse;
-  var toVerse;
-  var secondHalfOfFirstVerse;
-  var firstHalfOfLastVerse;
+  if (arg1 && Array.isArray((arg1 as Scriptures).scriptures)) {
 
-  if (arg1 && Array.isArray(arg1.scriptures)) {
-
-    if (arg1.scriptures.length == 0) {
+    const scriptures = (arg1 as Scriptures).scriptures!
+    if (scriptures.length == 0) {
       return Promise.resolve([]);
     }
 
-    return loadText(book, arg1.scriptures[0])
+    return loadText(book, scriptures[0])
     .then( result => {
 
-      arg1.scriptures = arg1.scriptures.slice(1);
+      (arg1 as Scriptures).scriptures = scriptures.slice(1);
       return loadText(book, arg1)
       .then( result2 => {
         return result.concat(result2);
@@ -273,14 +261,15 @@ function loadText(book, arg1?, arg2?) {
     });
 
   } else if (typeof(arg1)==='object') {
-    fromLine = arg1.fromLine;
-    toLine = arg1.toLine;
-    fromChapter = arg1.fromChapter;
-    fromVerse = arg1.fromVerse;
-    toChapter = arg1.toChapter;
-    toVerse = arg1.toVerse;
-    secondHalfOfFirstVerse = arg1.secondHalfOfFirstVerse;
-    firstHalfOfLastVerse = arg1.firstHalfOfLastVerse;
+    const _arg1 = arg1 as LoadTextOptions
+    fromLine = _arg1.fromLine;
+    toLine = _arg1.toLine;
+    fromChapter = _arg1.fromChapter;
+    fromVerse = _arg1.fromVerse;
+    toChapter = _arg1.toChapter;
+    toVerse = _arg1.toVerse;
+    secondHalfOfFirstVerse = _arg1.secondHalfOfFirstVerse;
+    firstHalfOfLastVerse = _arg1.firstHalfOfLastVerse;
   } else if (typeof(arg1)==='number') {
     fromLine = arg1;
     toLine = arg2;
@@ -300,7 +289,7 @@ function loadText(book, arg1?, arg2?) {
         throw 'Invalid fromChapter paramter';
       }
 
-      if (fromVerse > 1) {
+      if (fromVerse !== undefined && fromVerse > 1) {
         // fromLine is at beginning of chapter now.
         // search the from verse here
 
@@ -326,14 +315,16 @@ function loadText(book, arg1?, arg2?) {
 
     if (toChapter && !toVerse) {
 
+      const _toChapter = toChapter
       fromLine = fromLine || 0;
       toLine = lines.slice(fromLine).findIndex( line => {
-        return LineParser.parseChapter(line) === (toChapter+1);
+        return LineParser.parseChapter(line) === (_toChapter+1);
       });
       toLine = toLine >= 0 ? toLine + fromLine : undefined;
 
     } else if (toChapter && toVerse) {
 
+      const _toVerse = toVerse;
       var foundToVerse = false;
       var currentChapter = fromChapter || 1;
       fromLine = fromLine || 0;
@@ -353,14 +344,14 @@ function loadText(book, arg1?, arg2?) {
             // found next chapter
             return true;
           }
-          if (range && (toVerse < range.startVerse)) {
+          if (range && (_toVerse < range.startVerse)) {
             // found next verse
             return true;
           }
           if (chapterGroup) {
             return true;
           }
-          if (range && (range.startVerse <= toVerse && toVerse <= range.endVerse)) {
+          if (range && (range.startVerse <= _toVerse && _toVerse <= range.endVerse)) {
             foundToVerse = true;
           }
           if (subject && foundToVerse) {
@@ -381,8 +372,8 @@ function loadText(book, arg1?, arg2?) {
             // if subject is found, 
             // check if any text after the subject belongs to the 'to verse'.
             // if no, the subject is belongs to next verse.
-            let lastIndex = findLastParagraphText(array.slice(index), toVerse, toChapter);
-            if (lastIndex >= 0) {
+            let lastIndex = findLastParagraphText(array.slice(index), _toVerse, toChapter);
+            if (lastIndex !== undefined && lastIndex >= 0) {
               lastVerseIndex = index + lastIndex;
               return index == lastVerseIndex;
             }
@@ -551,7 +542,7 @@ function loadText(book, arg1?, arg2?) {
 
 }
 
-function parseBook(book, opts) {
+function parseBook(book:Book, opts:LoadTextOptions) {
 
   opts = opts || {};
   var onStartBook = opts.onStartBook || function(){};
@@ -569,31 +560,15 @@ function parseBook(book, opts) {
 
 }
 
-function getBook(shortName) {
-
-  return this.getBooks().then( books => {
-
-    return books.find( book => {
-      return book.shortName.toLowerCase() === shortName.toLowerCase();
-    });
-
-  }).then( book => {
-    if (!book) {
-      return Promise.reject(new Error('Book not found'));
-    }
-    return book;
-  });
-}
-
-function getChapterCount(book) {
+function getChapterCount(book:Book) {
 
   return loadText(book).then( lines => {
 
-    var chapter;
+    var chapter:number = 0;
     lines.forEach( line => {
       var c = LineParser.parseChapter(line);
       if (c) {
-        chapter = c;
+        chapter += c;
       }
     });
     return chapter;
@@ -601,11 +576,36 @@ function getChapterCount(book) {
   });
 }
 
-module.exports = function(dir, lang) {
+interface Parser {
+  books?: Book[];
+  lang: Language;
+  dir: string;
+  getBooks(): Promise<Book[]>
+  getBook(shortName:string): Promise<Book>
+}
+
+export default function(dir:string, lang:Language) {
   return {
     lang: lang,
     dir: dir,
-    getBooks: getBooks,
-    getBook: getBook
-  };
-};
+    getBooks: async function() {
+      if (this.books) {
+        return this.books;
+      } else {
+        this.books = await loadBooks(this.dir, this.lang);
+        return this.books;
+      }
+    },
+    getBook: async function(shortName:string) {
+      const books = await this.getBooks();
+      const book = books.find(book => {
+        return book.shortName.toLowerCase() === shortName.toLowerCase();
+      });
+      if (!book) {
+        return Promise.reject(new Error('Book not found'));
+      }
+      return book;
+    }
+  } as Parser;
+}
+export type { LoadTextOptions }
