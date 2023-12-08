@@ -576,7 +576,7 @@ function getChapterCount(book:Book) {
   });
 }
 
-interface Parser {
+export interface Bible {
   books?: Book[];
   lang: Language;
   dir: string;
@@ -584,7 +584,7 @@ interface Parser {
   getBook(shortName:string): Promise<Book>
 }
 
-export default function(dir:string, lang:Language) {
+function parseUsfm(dir:string, lang:Language) {
   return {
     lang: lang,
     dir: dir,
@@ -606,6 +606,8 @@ export default function(dir:string, lang:Language) {
       }
       return book;
     }
-  } as Parser;
+  } as Bible;
 }
+
+export default parseUsfm;
 export type { LoadTextOptions }

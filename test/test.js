@@ -1,21 +1,19 @@
-import { exit } from "process";
-import * as RCUV from "rcuv-usfm";
-import * as CUNP from "cunp-usfm";
-
 /* jshint esversion: 6 */
-import Parser, { LoadTextOptions } from '..';
+const CUNP = require('cunp-usfm');
+const RCUV = require('rcuv-usfm');
+const Parser = require('..').default;
 
-function parseArguments(argv:string[]): LoadTextOptions & { bookName:string } {
+function parseArguments(argv) {
 
-  var bookName:string;
-  var fromChapter:number;
-  var fromVerse:number|undefined;
-  var toChapter:number|undefined;
-  var toVerse:number|undefined;
+  var bookName;
+  var fromChapter;
+  var fromVerse;
+  var toChapter;
+  var toVerse;
   let secondHalfOfFirstVerse = false;
   let firstHalfOfLastVerse = false;
 
-  var parts:string[];
+  var parts;
   if (argv.length == 4) {
     parts = [argv[2], argv[3]];
   } else if (argv.length == 3) {
@@ -66,7 +64,7 @@ function parseArguments(argv:string[]): LoadTextOptions & { bookName:string } {
   }
 }
 
-async function run(argv:string[], bible:any) {
+async function run(argv, bible) {
 
   let options = parseArguments(argv);
   var parser = Parser(bible.pathOfFiles, bible.language);
@@ -82,11 +80,11 @@ async function run(argv:string[], bible:any) {
 
 }
 
-async function main(argv:string[]) {
+async function main(argv) {
 
   if (argv.length <= 2) {
     console.log('Usage ts-node test.js GEN 1:1-2:1')
-    exit()
+    process.exit()
   }
 
   const bibles = [

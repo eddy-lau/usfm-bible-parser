@@ -1,8 +1,12 @@
 {
   "name": "usfm-bible-parser",
-  "version": "1.0.1",
+  "version": "1.1.0-b5",
   "description": "USFM Bible Parser",
-  "main": "src/main.js",
+  "main": "dist/main.js",
+  "files": [
+    "dist/**/*"
+  ],
+  "types": "./dist/main.d.ts",
   "scripts": {
     "test": "ts-node test/test.ts",
     "build": "tsc --declaration"
@@ -10,12 +14,12 @@
   "author": "Eddie Lau",
   "license": "ISC",
   "dependencies": {
-    "@types/node": "^20.10.3",
-    "bible-book-data": "../bible-book-data/bible-book-data-1.1.0-b3.tgz"
+    "bible-book-data": "https://github.com/eddy-lau/bible-book-data/releases/download/1.1.0/bible-book-data-1.1.0.tgz"
   },
   "devDependencies": {
-    "cunp-usfm": "file:../cunp-usfm",
-    "rcuv-usfm": "file:../rcuv-usfm",
+    "@types/node": "^20.10.3",
+    "cunp-usfm": "link:../cunp-usfm",
+    "rcuv-usfm": "link:../rcuv-usfm",
     "ts-node": "^10.9.1",
     "typescript": "^5.3.2"
   }
