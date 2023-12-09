@@ -3,7 +3,7 @@ import * as RCUV from "rcuv-usfm";
 import * as CUNP from "cunp-usfm";
 
 /* jshint esversion: 6 */
-import Parser, { LoadTextOptions } from '..';
+import Parser, { LoadTextOptions } from '../src/main';
 
 function parseArguments(argv:string[]): LoadTextOptions & { bookName:string } {
 

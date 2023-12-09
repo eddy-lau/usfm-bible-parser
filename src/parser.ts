@@ -167,18 +167,23 @@ function findSubjectFromVerse(verseNumber:number, lines:string[]) {
 
 }
 
-function reverseFindSubjectFromVerse(fromVerse:number, toVerse:number, lines:string[]) {
-
-  const fromVerseLine = findVerse(fromVerse, lines);
-  if (fromVerseLine < 0) {
-    return -1;
-  }
+function reverseFindSubjectFromVerse(toVerse:number, lines:string[]) {
 
   const toVerseLine = findVerse(toVerse, lines);
   if (toVerseLine < 0) {
     return -1;
   }
 
+  for (let i = lines.length-1; i>toVerseLine; i-- ) {
+    if (LineParser.parseSubject(lines[i]) !== undefined) {
+      return i;
+    }
+    if (LineParser.parseParagraphText(lines[i]) !== undefined) {
+      return -1;
+    }
+  }
+
+  return -1;
 }
 
 function insertBreakAfterSubject(lines:string[]) {
@@ -305,7 +310,8 @@ function loadText(book:Book, arg1?:LoadTextOptions|Scriptures|number, arg2?:numb
         }
 
         // Find if there is a subject before ths line
-        var subjectLine = findSubjectFromVerse(fromVerse - 1, chapterLines.slice(0, verseLine));
+        // var subjectLine = findSubjectFromVerse(fromVerse - 1, chapterLines.slice(0, verseLine));
+        var subjectLine = reverseFindSubjectFromVerse(fromVerse - 1, chapterLines.slice(0, verseLine));
         if (subjectLine >= 0) {
           verseLine = subjectLine;
         }
