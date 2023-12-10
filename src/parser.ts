@@ -144,32 +144,9 @@ function findVerse(verseNumber:number, lines:string[], chapter?:number) {
   return lineNumber;
 }
 
-function findSubjectLine(lines:string[]) {
-
-  return lines.findIndex( line => {
-    return LineParser.parseSubject(line) !== undefined;
-  });
-}
-
 function findSubjectFromVerse(verseNumber:number, lines:string[]) {
 
-  var verseLine = findVerse(verseNumber, lines);
-  if (verseLine < 0) {
-    return -1;
-  }
-
-  var subjectLine = findSubjectLine(lines.slice(verseLine));
-  if (subjectLine < 0) {
-    return -1;
-  }
-
-  return verseLine + subjectLine;
-
-}
-
-function reverseFindSubjectFromVerse(toVerse:number, lines:string[]) {
-
-  const toVerseLine = findVerse(toVerse, lines);
+  const toVerseLine = findVerse(verseNumber, lines);
   if (toVerseLine < 0) {
     return -1;
   }
@@ -179,6 +156,29 @@ function reverseFindSubjectFromVerse(toVerse:number, lines:string[]) {
       return i;
     }
     if (LineParser.parseParagraphText(lines[i]) !== undefined) {
+      return -1;
+    }
+  }
+
+  return -1;
+}
+
+function findSubjectInsideThisVerse(verseNumber:number, lines:string[]) {
+
+  const verseLine = findVerse(verseNumber, lines);
+  if (verseLine < 0) {
+    return -1;
+  }
+
+  for (let i = verseLine+1; i<lines.length; i++) {
+    if (LineParser.parseSubject(lines[i]) !== undefined) {
+      return i;
+    }
+    const verseRange = LineParser.parseVerseRange(lines[i]);
+    if (verseRange && verseRange.startVerse != verseNumber) {
+      return -1;
+    }
+    if (LineParser.parseChapter(lines[i]) !== undefined) {
       return -1;
     }
   }
@@ -310,13 +310,21 @@ function loadText(book:Book, arg1?:LoadTextOptions|Scriptures|number, arg2?:numb
         }
 
         // Find if there is a subject before ths line
-        // var subjectLine = findSubjectFromVerse(fromVerse - 1, chapterLines.slice(0, verseLine));
-        var subjectLine = reverseFindSubjectFromVerse(fromVerse - 1, chapterLines.slice(0, verseLine));
+        var subjectLine = findSubjectFromVerse(fromVerse - 1, chapterLines.slice(0, verseLine));
         if (subjectLine >= 0) {
           verseLine = subjectLine;
         }
 
         fromLine = fromLine + verseLine;
+
+        // Handle second half of first verse.
+        // e.g. JHN 16:4b-16
+        if (secondHalfOfFirstVerse) {
+          const subjectLine = findSubjectInsideThisVerse(fromVerse, chapterLines.slice(verseLine));
+          if (subjectLine >= 0) {
+            fromLine += subjectLine;
+          }
+        }
 
       } else {
         // Skip the first chapter line

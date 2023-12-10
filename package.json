@@ -9,7 +9,7 @@
   "types": "./dist/main.d.ts",
   "scripts": {
     "test": "ts-node test/test.ts",
-    "build": "tsc --declaration"
+    "build": "tsc"
   },
   "author": "Eddie Lau",
   "license": "ISC",
