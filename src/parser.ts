@@ -174,6 +174,9 @@ function findSubjectInsideThisVerse(verseNumber:number, lines:string[]) {
     if (LineParser.parseSubject(lines[i]) !== undefined) {
       return i;
     }
+    if (LineParser.parseParagraphText(lines[i]) !== undefined) {
+      return i;
+    }
     const verseRange = LineParser.parseVerseRange(lines[i]);
     if (verseRange && verseRange.startVerse != verseNumber) {
       return -1;
@@ -317,18 +320,18 @@ function loadText(book:Book, arg1?:LoadTextOptions|Scriptures|number, arg2?:numb
 
         fromLine = fromLine + verseLine;
 
-        // Handle second half of first verse.
-        // e.g. JHN 16:4b-16
-        if (secondHalfOfFirstVerse) {
-          const subjectLine = findSubjectInsideThisVerse(fromVerse, chapterLines.slice(verseLine));
-          if (subjectLine >= 0) {
-            fromLine += subjectLine;
-          }
-        }
-
       } else {
         // Skip the first chapter line
         fromLine = fromLine + 1;
+      }
+
+      // Handle second half of first verse.
+      // e.g. JHN 16:4b-16
+      if (secondHalfOfFirstVerse && fromVerse !== undefined) {
+        const subjectLine = findSubjectInsideThisVerse(fromVerse, lines.slice(fromLine));
+        if (subjectLine >= 0) {
+          fromLine += subjectLine;
+        }
       }
     }
 

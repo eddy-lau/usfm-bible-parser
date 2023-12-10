@@ -29,39 +29,6 @@ export function patch(book: Book, options: LoadTextOptions, lines: string[]) {
 
   }
 
-  // 1SA 2:11b
-  if (book.id == '1SA' && fromChapter == 2 && fromVerse == 11 && secondHalfOfFirstVerse) {
-
-    lines = replaceText(lines,
-      '\\v 11 \\pn 以利加拿\\pn*往\\pn 拉瑪\\pn*回家去了。那孩子在祭司\\pn 以利\\pn*面前事奉耶和華。',
-      '\\p 那孩子在祭司\\pn 以利\\pn*面前事奉耶和華。',
-    );
-
-    lines = replaceText(lines,
-      '\\v 11 \\pn 以利加拿\\pn*往\\pn 拉瑪\\pn*回自己的家去了。那孩子在\\pn 以利\\pn*祭司面前事奉耶和華。',
-      '\\p 那孩子在\\pn 以利\\pn*祭司面前事奉耶和華。',
-    );
-
-  }
-
-  // 1SA 4:1b
-  if (book.id == '1SA' && fromChapter == 4 && fromVerse == 1 && secondHalfOfFirstVerse) {
-
-    lines = replaceText(lines,
-      '\\v 1 \\pn 撒母耳\\pn*的話傳遍了全\\pn 以色列\\pn*。',
-      '\\p',
-    );
-  }
-
-  // 2SA 12:15b
-  if (book.id == '2SA' && fromChapter == 12 && fromVerse == 15 && secondHalfOfFirstVerse) {
-
-    lines = replaceText(lines,
-      '\\v 15 \\pn 拿單\\pn*就回家去了。',
-      '\\p',
-    );
-  }
-
   // PSA 73:1-14
   if (book.id == 'PSA' && fromChapter == 73 && fromVerse == 1) {
 
@@ -83,21 +50,6 @@ export function patch(book: Book, options: LoadTextOptions, lines: string[]) {
       '\\p \\pn 乃縵\\pn*離開他去了。走了一小段路，',
       '\\p',
     );
-  }
-
-  // 2KI 5:19b-27
-  if (book.id == '2KI' && fromChapter == 5 && fromVerse == 19 && secondHalfOfFirstVerse) {
-
-    lines = replaceText(lines,
-      '\\v 19 \\pn 以利沙\\pn*對他說：「你可以平平安安地回去！」',
-      '\\p',
-    );
-
-    lines = replaceText(lines,
-      '\\v 19 \\pn 以利沙\\pn*對他說：「你平安地回去吧！」',
-      '\\p',
-    );
-
   }
 
   // LEV 19:1-19a
