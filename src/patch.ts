@@ -38,20 +38,6 @@ export function patch(book: Book, options: LoadTextOptions, lines: string[]) {
 
   }
 
-  // 2KI 5:1-19a
-  if (book.id == '2KI' && toChapter == 5 && toVerse == 19 && firstHalfOfLastVerse) {
-
-    lines = replaceText(lines,
-      '\\p \\pn 乃縵\\pn*就離開他去了；走了不遠，',
-      '\\p',
-    );
-
-    lines = replaceText(lines,
-      '\\p \\pn 乃縵\\pn*離開他去了。走了一小段路，',
-      '\\p',
-    );
-  }
-
   // LEV 19:1-19a
   if (book.id == 'LEV' && toChapter == 19 && toVerse == 19 && firstHalfOfLastVerse) {
 

@@ -357,6 +357,7 @@ function loadText(book:Book, arg1?:LoadTextOptions|Scriptures|number, arg2?:numb
           var chapter = LineParser.parseChapter(line);
           var subject = LineParser.parseSubject(line);
           var chapterGroup = LineParser.parseChapterGroup(line);
+          var paragraphText = LineParser.parseParagraphText(line);
           var lastVerseIndex;
 
           if (lastVerseIndex !== undefined) {
@@ -371,6 +372,7 @@ function loadText(book:Book, arg1?:LoadTextOptions|Scriptures|number, arg2?:numb
             return true;
           }
           if (chapterGroup) {
+            // found "\ms" marker
             return true;
           }
           if (range && (range.startVerse <= _toVerse && _toVerse <= range.endVerse)) {
@@ -382,14 +384,6 @@ function loadText(book:Book, arg1?:LoadTextOptions|Scriptures|number, arg2?:numb
               // e.g. ACT 9:1-19a
               return true;
             }
-            // FIXME
-
-            // 2PE 2:1-10a      2PE 2:10b-22
-            // JHN 15:18-16:4a  JHN 16:4b-15
-            // LUK 9:18-43a     LUK 9:43b-62
-            // ACT 9:1-19a      ACT 9:19b-31
-            // ISA 24:1-16a     ISA 24:16b-23
-
 
             // if subject is found, 
             // check if any text after the subject belongs to the 'to verse'.
@@ -403,6 +397,10 @@ function loadText(book:Book, arg1?:LoadTextOptions|Scriptures|number, arg2?:numb
             return true;
           }
 
+          if (paragraphText && foundToVerse && firstHalfOfLastVerse) {
+            return true;
+          }
+
           return false;
         } else {
           currentChapter = LineParser.parseChapter(line) || currentChapter;
@@ -410,6 +408,15 @@ function loadText(book:Book, arg1?:LoadTextOptions|Scriptures|number, arg2?:numb
         }
 
       });
+
+
+      // FIXME 
+      // (20231211: All the following should be fixed. Need to verify.)
+      // 2PE 2:1-10a      2PE 2:10b-22
+      // JHN 15:18-16:4a  JHN 16:4b-15
+      // LUK 9:18-43a     LUK 9:43b-62
+      // ACT 9:1-19a      ACT 9:19b-31
+      // ISA 24:1-16a     ISA 24:16b-23
 
       if (toLine < 0) {
         //if (foundToVerse) {
