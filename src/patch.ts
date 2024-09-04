@@ -78,5 +78,35 @@ export function patch(book: Book, options: LoadTextOptions, lines: string[]) {
 
   }
 
+  // REV 1:1-4a
+  if (book.id == 'REV' && fromChapter == 1 && fromVerse == 1 && toVerse == 4 && firstHalfOfLastVerse) {
+
+      lines = replaceText(lines,
+        '\\v 4 \\pn 約翰\\pn*寫信給\\pn 亞細亞\\pn*的七個教會。但願從那昔在、今在、以後永在的\\add 上帝\\add*，和他寶座前的七靈，',
+        '\\v 4 \\pn 約翰\\pn*寫信給\\pn 亞細亞\\pn*的七個教會。',
+      )
+
+      lines = replaceText(lines,
+        '\\v 4-5 \\pn 約翰\\pn*寫信給\\pn 亞細亞\\pn*的七個教會。願那位今在、昔在、以後永在的上帝，與他寶座前的七靈，和那忠信的見證者、從死人中復活的首生者\\f + 「首生者」或譯「長子」。\\f*、世上君王的元首耶穌基督，賜恩惠和平安\\f + 「平安」或譯「和平」。\\f*給你們。',
+        '\\v 4 \\pn 約翰\\pn*寫信給\\pn 亞細亞\\pn*的七個教會。',
+      )
+
+  }
+
+  // REV 1:4b-8
+  if (book.id == 'REV' && fromChapter == 1 && fromVerse == 4 && toVerse == 8 && secondHalfOfFirstVerse) {
+
+    lines = replaceText(lines,
+      '\\v 4 \\pn 約翰\\pn*寫信給\\pn 亞細亞\\pn*的七個教會。但願從那昔在、今在、以後永在的\\add 上帝\\add*，和他寶座前的七靈，',
+      '\\p 但願從那昔在、今在、以後永在的\\add 上帝\\add*，和他寶座前的七靈，',
+    )
+
+    if (lines[0] === '\\p 他愛我們，用自己的血使我們從罪中得釋放 \\f + 「得釋放」：有古卷是「洗去」。\\f*，') {
+      lines = ['\\v 4-5 願那位今在、昔在、以後永在的上帝，與他寶座前的七靈，和那忠信的見證者、從死人中復活的首生者\\f + 「首生者」或譯「長子」。\\f*、世上君王的元首耶穌基督，賜恩惠和平安\\f + 「平安」或譯「和平」。\\f*給你們。', ...lines];
+    }
+
+}
+
+
   return lines;
 }

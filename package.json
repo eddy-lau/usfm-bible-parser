@@ -1,6 +1,6 @@
 {
   "name": "usfm-bible-parser",
-  "version": "1.1.0-b5",
+  "version": "1.1.0-b6",
   "description": "USFM Bible Parser",
   "main": "dist/main.js",
   "files": [
