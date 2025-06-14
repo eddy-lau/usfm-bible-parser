@@ -105,7 +105,7 @@ export function patch(book: Book, options: LoadTextOptions, lines: string[]) {
       lines = ['\\v 4-5 願那位今在、昔在、以後永在的上帝，與他寶座前的七靈，和那忠信的見證者、從死人中復活的首生者\\f + 「首生者」或譯「長子」。\\f*、世上君王的元首耶穌基督，賜恩惠和平安\\f + 「平安」或譯「和平」。\\f*給你們。', ...lines];
     }
 
-}
+  }
 
 
   return lines;

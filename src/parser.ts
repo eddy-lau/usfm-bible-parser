@@ -321,8 +321,16 @@ function loadText(book:Book, arg1?:LoadTextOptions|Scriptures|number, arg2?:numb
         fromLine = fromLine + verseLine;
 
       } else {
-        // Skip the first chapter line
-        fromLine = fromLine + 1;
+        // Skip the first chapter line if the chapter has no extra info.
+        //
+        // E.g. 
+        //
+        // Skip this: \c 1
+        // Don't skip this: \c 10 \f + \ft 本詩篇原文是字母詩。\f*  
+        //
+        if (lines[fromLine].match(/\\c\s*\d+\s*$/)) {
+          fromLine = fromLine + 1;
+        }
       }
 
       // Handle second half of first verse.
